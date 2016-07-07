@@ -45,7 +45,11 @@ func translate(lang LangId, message string, args ...interface{}) string {
 		}
 
 	}
-	return message
+	if args != nil && len(args) > 0 {
+		return fmt.Sprintf(message, args...)
+	} else {
+		return message
+	}
 }
 
 // Function L selects Language for the translation. It takes LangId and returns a function which

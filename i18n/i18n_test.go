@@ -9,9 +9,10 @@ const (
 
 var (
 	bundle Bundle = map[string][]string{
-		"msg1": []string{"msg1", "poruka1"},
-		"msg3": []string{"", "poruka3"},
-		"msg4": []string{"msg4 %s", "poruka4 %s"},
+		"msg1":    []string{"msg1", "poruka1"},
+		"msg3":    []string{"", "poruka3"},
+		"msg4":    []string{"msg4 %s", "poruka4 %s"},
+		"msg5 %s": []string{"", "poruka5 %s"},
 	}
 )
 
@@ -44,6 +45,14 @@ func TestLoad(t *testing.T) {
 	translation = L(hr)("msg4", "f")
 	if translation != "poruka4 f" {
 		t.Fatalf("Wrong translation. expected: %s got %s", "poruka4 f", translation)
+	}
+	translation = L(en)("msg5 %s", "f")
+	if translation != "msg5 f" {
+		t.Fatalf("Wrong translation. expected: %s got %s", "msg5 f", translation)
+	}
+	translation = L(en)("msg6 %s", "f")
+	if translation != "msg6 f" {
+		t.Fatalf("Wrong translation. expected: %s got %s", "msg6 f", translation)
 	}
 
 }

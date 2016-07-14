@@ -14,6 +14,7 @@ type Dialog struct {
 	Message string
 	Html    template.HTML
 	Actions []MenuItem
+	Form    Form
 }
 type NotificationType int
 
@@ -24,4 +25,11 @@ const (
 type Notification struct {
 	Type NotificationType
 	Text string
+}
+
+type Form struct {
+	Action string
+	Class  string
+	Data   map[string]string
+	Submit MenuItem
 }

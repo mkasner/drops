@@ -9,8 +9,10 @@ import (
 
 type MenuId uint8
 
+type contextid int
+
 const (
-	appkey = iota
+	appkey contextid = iota
 	datakey
 )
 

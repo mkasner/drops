@@ -104,10 +104,6 @@ type SpfResponse struct {
 	Foot  string            `json:"foot"`
 }
 
-func AppContext(ctx context.Context, app *App) context.Context {
-	return context.WithValue(ctx, appkey, app)
-}
-
 func AppFromContext(ctx context.Context) *App {
 	return ctx.Value(appkey).(*App)
 }

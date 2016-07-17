@@ -7,17 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
-
-	"golang.org/x/net/context"
 )
-
-func GetData(ctx context.Context, app *App, contentKey string) (interface{}, error) {
-	ctx = AppContext(ctx, app)
-	if page, ok := app.Pages[contentKey]; ok {
-		return page.Data(ctx)
-	}
-	return nil, nil
-}
 
 func loadIds(app *App) {
 	for id, p := range app.Pages {
@@ -38,16 +28,6 @@ func loadHandlers(app *App) {
 	}
 
 }
-
-// deprecated
-//func GetTemplate(app *App, id string, tpl Template) Template {
-//        if app.Dev {
-//                th := tpl.(*HtmlTemplate)
-//                tpl, s := loadTemplate(app.TemplatePath, th.File, id, app.TemplateFuncs)
-//                return NewHtmlTemplate(th.Name(), th.File, s, tpl)
-//        }
-//        return tpl
-//}
 
 func loadTemplates(app *App, path string) {
 	for _, p := range app.Pages {

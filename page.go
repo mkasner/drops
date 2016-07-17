@@ -9,13 +9,6 @@ import (
 
 type MenuId uint8
 
-type contextid int
-
-const (
-	appkey contextid = iota
-	datakey
-)
-
 type App struct {
 	Menu          Menu
 	Pages         map[string]Page
@@ -102,16 +95,4 @@ type SpfResponse struct {
 	Body  map[string]string `json:"body"`
 	Attr  map[string]string `json:"attr"`
 	Foot  string            `json:"foot"`
-}
-
-func AppFromContext(ctx context.Context) *App {
-	return ctx.Value(appkey).(*App)
-}
-
-func DataContext(ctx context.Context, data interface{}) context.Context {
-	return context.WithValue(ctx, datakey, data)
-}
-
-func DataFromContext(ctx context.Context) interface{} {
-	return ctx.Value(datakey)
 }

@@ -19,7 +19,7 @@ func Random() string {
 
 // gets random string in range
 func RandomInRange(min, max int) string {
-	return randString(randLength(minRandLength, maxRandLength))
+	return randString(randLength(min, max))
 }
 
 func randLength(min, max int) int {

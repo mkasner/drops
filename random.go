@@ -23,6 +23,9 @@ func RandomInRange(min, max int) string {
 }
 
 func randLength(min, max int) int {
+	if min == max {
+		return min
+	}
 	rl, _ := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
 	return int(rl.Int64()) + min
 }

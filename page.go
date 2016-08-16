@@ -58,6 +58,7 @@ type Page struct {
 	Ordinal      int
 	HtmlMenuItem string
 	Parent       string
+	Permission   int
 }
 type PageOrdered []Page
 

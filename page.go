@@ -59,6 +59,7 @@ type Page struct {
 	HtmlMenuItem string
 	Parent       string
 	Permission   int
+	Submenu      MenuId
 }
 type PageOrdered []Page
 
@@ -90,10 +91,10 @@ type Widget struct {
 }
 
 type SpfResponse struct {
-	Title string            `json:"title"`
-	Url   string            `json:"url"`
-	Head  string            `json:"head"`
-	Body  map[string]string `json:"body"`
-	Attr  map[string]string `json:"attr"`
-	Foot  string            `json:"foot"`
+	Title string                       `json:"title"`
+	Url   string                       `json:"url"`
+	Head  string                       `json:"head"`
+	Body  map[string]string            `json:"body"`
+	Attr  map[string]map[string]string `json:"attr"`
+	Foot  string                       `json:"foot"`
 }

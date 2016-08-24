@@ -9,6 +9,12 @@ import (
 
 type MenuId uint8
 
+// Menu configuration
+type MenuCfg struct {
+	MenuId  MenuId
+	Ordinal int
+}
+
 type App struct {
 	Menu          Menu
 	Pages         map[string]Page
@@ -52,32 +58,51 @@ type Page struct {
 	Url          string
 	Label        string
 	Handler      http.Handler
-	Menu         MenuId
+	Menu         []MenuCfg
 	Data         func(context.Context) (interface{}, error)
 	Template     Template
-	Ordinal      int
 	HtmlMenuItem string
 	Parent       string
 	Permission   int
 	Submenu      MenuId
 }
-type PageOrdered []Page
 
-func (a PageOrdered) Len() int           { return len(a) }
-func (a PageOrdered) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a PageOrdered) Less(i, j int) bool { return a[i].Ordinal < a[j].Ordinal }
+func (t *Page) HasMenu(mid MenuId) bool {
+	for _, m := range t.Menu {
+		if mid == m.MenuId {
+			return true
+		}
+	}
+	return false
+}
+
+func (t *Page) Ordinal(mid MenuId) int {
+	for _, m := range t.Menu {
+		if mid == m.MenuId {
+			return m.Ordinal
+		}
+	}
+	return 0
+}
 
 type Menu struct {
 	Items []MenuItem
 }
 
 type MenuItem struct {
-	Label string
-	Href  string
-	Html  template.HTML
-	Class string
-	Data  map[string]string
+	Label   string
+	Href    string
+	Html    template.HTML
+	Class   string
+	Data    map[string]string
+	Ordinal int
 }
+
+type MenuItemOrdered []MenuItem
+
+func (a MenuItemOrdered) Len() int           { return len(a) }
+func (a MenuItemOrdered) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a MenuItemOrdered) Less(i, j int) bool { return a[i].Ordinal < a[j].Ordinal }
 
 type Footer struct {
 	Template

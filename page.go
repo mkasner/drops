@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 type MenuId uint8

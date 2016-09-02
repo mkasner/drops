@@ -65,6 +65,7 @@ type Page struct {
 	Parent       string
 	Permission   int
 	Submenu      MenuId
+	Description  string
 }
 
 func (t *Page) HasMenu(mid MenuId) bool {

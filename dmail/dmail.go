@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+type AuthType int
+
+const (
+	AuthTypePlain AuthType = iota
+	AuthTypeLogin
+)
+
 type Service struct {
 	settings MailSettings
 	auth     smtp.Auth
@@ -18,7 +25,15 @@ func New(server string, port int, username, password string) *Service {
 	s.auth = smtp.PlainAuth("", s.settings.Username, s.settings.Password, s.settings.Server)
 
 	return s
+}
 
+func (t *Service) SetAuthType(typ AuthType) {
+	switch typ {
+	case AuthTypePlain:
+		t.auth = smtp.PlainAuth("", t.settings.Username, t.settings.Password, t.settings.Server)
+	case AuthTypeLogin:
+		t.auth = LoginAuth(t.settings.Username, t.settings.Password, t.settings.Server)
+	}
 }
 
 func (t *Service) Send(m Email) error {

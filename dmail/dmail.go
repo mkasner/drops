@@ -11,6 +11,7 @@ type AuthType int
 const (
 	AuthTypePlain AuthType = iota
 	AuthTypeLogin
+	AuthTypeNoAuth
 )
 
 type Service struct {
@@ -33,6 +34,8 @@ func (t *Service) SetAuthType(typ AuthType) {
 		t.auth = smtp.PlainAuth("", t.settings.Username, t.settings.Password, t.settings.Server)
 	case AuthTypeLogin:
 		t.auth = LoginAuth(t.settings.Username, t.settings.Password, t.settings.Server)
+	case AuthTypeNoAuth:
+		t.auth = nil
 	}
 }
 

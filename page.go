@@ -97,7 +97,7 @@ type MenuItem struct {
 	Class   string
 	Data    map[string]string
 	Ordinal int
-	Inner   string
+	Inner   template.HTML
 }
 
 type MenuItemOrdered []MenuItem

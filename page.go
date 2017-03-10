@@ -35,7 +35,7 @@ func (t *App) GetTemplate(id string) Template {
 	tpl := t.Pages[id].Template
 	if t.Dev {
 		th := tpl.(*HtmlTemplate)
-		tpl, s := loadTemplate(t.TemplatePath, th.File, id, t.TemplateFuncs)
+		tpl, s := loadTemplate(t.TemplatePath, th.File, id, t.TemplateFuncs, t.Subdirectory)
 		return NewHtmlTemplate(th.Name(), th.File, s, tpl)
 	}
 	return tpl
@@ -45,7 +45,7 @@ func (t *App) GetWidget(id string) Template {
 	tpl := t.Widgets[id].Template
 	if t.Dev {
 		th := tpl.(*HtmlTemplate)
-		tpl, s := loadTemplate(t.TemplatePath, th.File, id, t.TemplateFuncs)
+		tpl, s := loadTemplate(t.TemplatePath, th.File, id, t.TemplateFuncs, t.Subdirectory)
 		return NewHtmlTemplate(th.Name(), th.File, s, tpl)
 	}
 	return tpl
@@ -66,6 +66,8 @@ type Page struct {
 	Permission   int
 	Submenu      MenuId
 	Description  string
+	Subcontent   []string // subcontent widgets which can be included on page
+	Inactive     bool
 }
 
 func (t *Page) HasMenu(mid MenuId) bool {

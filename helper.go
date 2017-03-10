@@ -7,6 +7,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+	"regexp"
+)
+
+var (
+	subdirRegex = regexp.MustCompile("(href|src)=\"(.*?)\"")
 )
 
 func loadIds(app *App) {
@@ -32,7 +37,7 @@ func loadHandlers(app *App) {
 func loadTemplates(app *App, path string) {
 	for _, p := range app.Pages {
 		if len(p.File) > 0 {
-			tpl, s := loadTemplate(path, p.File, p.Id, app.TemplateFuncs)
+			tpl, s := loadTemplate(path, p.File, p.Id, app.TemplateFuncs, app.Subdirectory)
 			page := app.Pages[p.Id]
 			page.Template = NewHtmlTemplate(p.Name, p.File, s, tpl)
 			app.Pages[p.Id] = page
@@ -40,7 +45,7 @@ func loadTemplates(app *App, path string) {
 	}
 	for _, p := range app.Widgets {
 		if len(p.File) > 0 {
-			tpl, s := loadTemplate(path, p.File, p.Id, app.TemplateFuncs)
+			tpl, s := loadTemplate(path, p.File, p.Id, app.TemplateFuncs, app.Subdirectory)
 			widget := app.Widgets[p.Id]
 			widget.Template = NewHtmlTemplate(p.Name, p.File, s, tpl)
 			app.Widgets[p.Id] = widget
@@ -49,12 +54,16 @@ func loadTemplates(app *App, path string) {
 	return
 }
 
-func loadTemplate(path, file, id string, funcs template.FuncMap) (*template.Template, string) {
+func loadTemplate(path, file, id string, funcs template.FuncMap, subdirectory string) (*template.Template, string) {
 	b, err := ioutil.ReadFile(filepath.Join(path, file))
 	if err != nil {
 		panic(err)
 	}
 	s := string(b)
+	// TODO test and finish this
+	//if len(subdirectory) > 0 {
+	//        s = subdirRegex.ReplaceAllString(s, fmt.Sprintf("$1=\"%s$2\"", subdirectory))
+	//}
 	tpl := template.Must(template.New(id).Funcs(funcs).Parse(s))
 	return tpl, s
 }

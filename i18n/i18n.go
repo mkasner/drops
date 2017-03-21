@@ -3,7 +3,10 @@ package i18n
 
 import "fmt"
 
-var instance translator
+var (
+	instance    translator
+	defaultLang LangId
+)
 
 type translator struct {
 	bundle Bundle
@@ -14,6 +17,10 @@ type Bundle map[string][]string
 func Load(bundle Bundle) error {
 	instance = translator{bundle: bundle}
 	return nil
+}
+
+func DefaultLang(l LangId) {
+	defaultLang = l
 }
 
 type LangId uint8
@@ -62,5 +69,5 @@ func L(langId LangId) func(string, ...interface{}) string {
 
 // Function T means 'Translate'. It takes message
 func T(message string, args ...interface{}) string {
-	return translate(0, message, args...)
+	return translate(defaultLang, message, args...)
 }

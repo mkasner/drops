@@ -2,21 +2,20 @@ package i18n
 
 import "testing"
 
-const (
-	en LangId = iota
-	hr
-)
-
-var (
-	bundle Bundle = map[string][]string{
-		"msg1":    []string{"msg1", "poruka1"},
-		"msg3":    []string{"", "poruka3"},
-		"msg4":    []string{"msg4 %s", "poruka4 %s"},
-		"msg5 %s": []string{"", "poruka5 %s"},
-	}
-)
-
 func TestLoad(t *testing.T) {
+	const (
+		en LangId = iota
+		hr
+	)
+
+	var (
+		bundle Bundle = map[string][]string{
+			"msg1":    []string{"msg1", "poruka1"},
+			"msg3":    []string{"", "poruka3"},
+			"msg4":    []string{"msg4 %s", "poruka4 %s"},
+			"msg5 %s": []string{"", "poruka5 %s"},
+		}
+	)
 	Load(bundle)
 	translation := T("msg1")
 	if translation != "msg1" {

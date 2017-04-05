@@ -31,6 +31,11 @@ func (t *App) Init() {
 	loadTemplates(t, t.TemplatePath)
 }
 
+func (t *App) Module() {
+	loadIds(t)
+	loadHandlers(t)
+}
+
 func (t *App) GetTemplate(id string) Template {
 	tpl := t.Pages[id].Template
 	if t.Dev {
@@ -126,4 +131,28 @@ type SpfResponse struct {
 	Body  map[string]string            `json:"body"`
 	Attr  map[string]map[string]string `json:"attr"`
 	Foot  string                       `json:"foot"`
+}
+
+func MergeApps(app *App, merges ...App) *App {
+	if app.Pages == nil {
+		app.Pages = make(map[string]Page)
+	}
+	if app.Widgets == nil {
+		app.Widgets = make(map[string]Widget)
+	}
+	if app.TemplateFuncs == nil {
+		app.TemplateFuncs = make(template.FuncMap)
+	}
+	for _, merge := range merges {
+		for id, page := range merge.Pages {
+			app.Pages[id] = page
+		}
+		for id, widget := range merge.Widgets {
+			app.Widgets[id] = widget
+		}
+		for id, fn := range merge.TemplateFuncs {
+			app.TemplateFuncs[id] = fn
+		}
+	}
+	return app
 }

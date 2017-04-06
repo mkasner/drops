@@ -21,8 +21,8 @@ type App struct {
 	Widgets       map[string]Widget
 	TemplatePath  string
 	Subdirectory  string
-	Dev           bool // development mode, loads template from file
-	TemplateFuncs template.FuncMap
+	Dev           bool             // development mode, loads template from file
+	TemplateFuncs template.FuncMap `json:"-"`
 }
 
 func (t *App) Init() {
@@ -31,7 +31,9 @@ func (t *App) Init() {
 	loadTemplates(t, t.TemplatePath)
 }
 
-func (t *App) Module() {
+// Plugin only instantiates handlers, not templates
+// Useful when application is behaving like a plugin, and not rendering templates
+func (t *App) Plugin() {
 	loadIds(t)
 	loadHandlers(t)
 }
@@ -62,9 +64,9 @@ type Page struct {
 	Name         string
 	Url          string
 	Label        string
-	Handler      http.Handler
+	Handler      http.Handler `json:"-"`
 	Menu         []MenuCfg
-	Data         func(context.Context) (interface{}, error)
+	Data         func(context.Context) (interface{}, error) `json:"-"`
 	Template     Template
 	HtmlMenuItem string
 	Parent       string

@@ -24,6 +24,19 @@ const (
 	Info
 )
 
+func (t NotificationType) String() string {
+	switch t {
+	case Success:
+		return "success"
+	case Warning:
+		return "warning"
+	case Info:
+		return "information"
+	default:
+		return "success"
+	}
+}
+
 type Notification struct {
 	Type NotificationType
 	Text string

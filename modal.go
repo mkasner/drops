@@ -20,6 +20,8 @@ type NotificationType int
 
 const (
 	Success NotificationType = iota
+	Warning
+	Info
 )
 
 type Notification struct {

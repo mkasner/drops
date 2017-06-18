@@ -88,15 +88,17 @@ func AddToTemplate(buff *bytes.Buffer, tpl *template.Template) (*template.Templa
 // including child
 // it enables hierarchical organisation of subcontent widgets
 func loadSubcontents(app *App) {
-	for _, p := range app.Pages {
-		p.Subcontent = loadSubcontent(app, p.Id)
-		p.Subcontent = uniqueSubcontents(p.Subcontent)
-		app.Pages[p.Id] = p
-	}
 	for _, p := range app.Widgets {
 		p.Subcontent = loadSubcontent(app, p.Id)
 		p.Subcontent = uniqueSubcontents(p.Subcontent)
 		app.Widgets[p.Id] = p
+	}
+	for _, p := range app.Pages {
+		for _, sc := range p.Subcontent {
+			p.Subcontent = append(p.Subcontent, loadSubcontent(app, sc)...)
+		}
+		p.Subcontent = uniqueSubcontents(p.Subcontent)
+		app.Pages[p.Id] = p
 	}
 }
 

@@ -51,7 +51,6 @@ func loadTemplates(app *App, path string) {
 			app.Widgets[p.Id] = widget
 		}
 	}
-	return
 }
 
 func loadTemplate(path, file, id string, funcs template.FuncMap, subdirectory string) (*template.Template, string) {
@@ -83,4 +82,49 @@ func AddToTemplate(buff *bytes.Buffer, tpl *template.Template) (*template.Templa
 		return tpl, err
 	}
 	return tpl.Parse(buff.String())
+}
+
+// calculates all subcontents for pages and widgets
+// including child
+// it enables hierarchical organisation of subcontent widgets
+func loadSubcontents(app *App) {
+	for _, p := range app.Pages {
+		p.Subcontent = loadSubcontent(app, p.Id)
+		p.Subcontent = uniqueSubcontents(p.Subcontent)
+		app.Pages[p.Id] = p
+	}
+	for _, p := range app.Widgets {
+		p.Subcontent = loadSubcontent(app, p.Id)
+		p.Subcontent = uniqueSubcontents(p.Subcontent)
+		app.Widgets[p.Id] = p
+	}
+}
+
+func Subcontent(app *App, contentKey string) []string {
+	var result []string
+	result = loadSubcontent(app, contentKey)
+	return result
+}
+
+// loads subcontent from content and all child subcontents
+// it works with recursive call to child subcontent
+func loadSubcontent(app *App, contentKey string) []string {
+	subcontent := app.Widgets[contentKey].Subcontent
+	for _, sc := range subcontent {
+		subcontent = append(subcontent, loadSubcontent(app, sc)...) // recursive call for child subcontents
+	}
+	return subcontent
+}
+
+func uniqueSubcontents(subcontents []string) []string {
+	var result []string
+	umap := make(map[string]struct{})
+	for _, sc := range subcontents {
+		if _, ok := umap[sc]; ok {
+			continue
+		}
+		umap[sc] = struct{}{}
+		result = append(result, sc)
+	}
+	return result
 }

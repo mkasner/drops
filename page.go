@@ -29,6 +29,7 @@ func (t *App) Init() {
 	loadIds(t)
 	loadHandlers(t)
 	loadTemplates(t, t.TemplatePath)
+	loadSubcontents(t)
 }
 
 // Plugin only instantiates handlers, not templates

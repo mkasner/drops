@@ -120,10 +120,11 @@ type Footer struct {
 }
 
 type Widget struct {
-	Id       string
-	Name     string
-	File     string
-	Template Template
+	Id         string
+	Name       string
+	File       string
+	Template   Template
+	Subcontent []string // subcontent widgets which can be included with this widget
 }
 
 type SpfResponse struct {

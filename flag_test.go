@@ -12,7 +12,7 @@ func TestFlags(t *testing.T) {
 		Flag3
 	)
 
-	var flagset uint
+	var flagset Flag
 	var flag Flag
 	// setting flags
 	fmt.Println("Setting flags...")

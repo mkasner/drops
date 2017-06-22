@@ -2,16 +2,16 @@ package drops
 
 type Flag uint
 
-func SetFlag(set uint, flag Flag) uint {
-	return set ^ uint(flag)
+func SetFlag(set Flag, flag Flag) Flag {
+	return set ^ flag
 }
 
-func UnsetFlag(set uint, flag Flag) uint {
-	return set &^ uint(flag)
+func UnsetFlag(set Flag, flag Flag) Flag {
+	return set &^ flag
 }
 
-func IsFlag(set uint, flag Flag) bool {
-	if set&uint(flag) > 0 {
+func IsFlag(set Flag, flag Flag) bool {
+	if set&flag > 0 {
 		return true
 	}
 	return false

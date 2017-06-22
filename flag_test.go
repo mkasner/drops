@@ -17,7 +17,7 @@ func TestFlags(t *testing.T) {
 	// setting flags
 	fmt.Println("Setting flags...")
 	flag = Flag1
-	flagset = SetFlag(flagset, flag)
+	flagset = SetFlag(flag)
 	fmt.Println(flagset, flag)
 	fmt.Printf("flag1 %b %t\n", flagset, IsFlag(flagset, flag))
 	if !IsFlag(flagset, flag) {
@@ -25,7 +25,7 @@ func TestFlags(t *testing.T) {
 	}
 
 	flag = Flag2
-	flagset = SetFlag(flagset, flag)
+	flagset = SetFlag(flag)
 	fmt.Println(flagset, flag)
 	fmt.Printf("flag2 %b %t\n", flagset, IsFlag(flagset, flag))
 	if !IsFlag(flagset, flag) {
@@ -33,7 +33,7 @@ func TestFlags(t *testing.T) {
 	}
 
 	flag = Flag3
-	flagset = SetFlag(flagset, flag)
+	flagset = SetFlag(flag)
 	fmt.Println(flagset, flag)
 	fmt.Printf("flag3 %b %t\n", flagset, IsFlag(flagset, flag))
 	if !IsFlag(flagset, flag) {
@@ -42,6 +42,7 @@ func TestFlags(t *testing.T) {
 
 	fmt.Println("Unsetting flags...")
 	flag = Flag3
+	flagset = SetFlag(flag)
 	flagset = UnsetFlag(flagset, flag)
 	fmt.Println(flagset, flag)
 	fmt.Printf("flag3 %b %t\n", flagset, IsFlag(flagset, flag))
@@ -50,6 +51,21 @@ func TestFlags(t *testing.T) {
 	}
 
 	flag = Flag1
+	flagset = SetFlag(flag)
+	flagset = UnsetFlag(flagset, flag)
+	fmt.Println(flagset, flag)
+	fmt.Printf("flag1 %b %t\n", flagset, IsFlag(flagset, flag))
+	if IsFlag(flagset, flag) {
+		t.Fatalf("Flag1 should be not set")
+	}
+
+	// setting multiple flags
+	flag = Flag1
+	flagset = 0
+	flagset = AddFlag(Flag1, Flag2, Flag3)
+	if !IsFlag(flagset, Flag2) {
+		t.Fatalf("Flag2 should be set")
+	}
 	flagset = UnsetFlag(flagset, flag)
 	fmt.Println(flagset, flag)
 	fmt.Printf("flag1 %b %t\n", flagset, IsFlag(flagset, flag))

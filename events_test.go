@@ -49,7 +49,7 @@ func TestEvents(t *testing.T) {
 	emitter.Dispatch(Event1, nil, nil)
 	emitter.Dispatch(Event2, nil, nil)
 	emitter.Dispatch(Event3, nil, nil)
-	time.Sleep(1 * time.Second)
+	//time.Sleep(1 * time.Second)
 
 	emitter.Close()
 	close(countHandles)

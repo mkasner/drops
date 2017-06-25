@@ -1,6 +1,7 @@
 package drops
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -21,7 +22,8 @@ type EventEmitter struct {
 	eventCh   chan *event
 	handlerCh chan EventHandler
 	handlers  []handler
-	wg        sync.WaitGroup
+	wg        sync.WaitGroup // Emitter process wait group
+	ewg       sync.WaitGroup // Events wait group, waits for all events to notfiy handlers if they exist
 	closeCh   chan struct{}
 }
 
@@ -60,13 +62,22 @@ func (t *EventEmitter) handle() {
 	for {
 		select {
 		case <-t.closeCh:
+			//t.ewg.Wait()
 			t.closeCh <- struct{}{}
 			t.wg.Done()
 			return
 		case e := <-t.eventCh:
+			fmt.Println("Going to handle event")
+			once := &sync.Once{}
 			for _, h := range t.handlers {
 				go func(h EventHandler) {
+					once.Do(func() {
+						fmt.Println("Handlers are notified")
+						t.ewg.Done() // handlers are notified
+					})
+					t.ewg.Add(1) // handling event
 					h.Handle(e.Event, e.Data, e.Err)
+					t.ewg.Done() // handling event done
 				}(h.h)
 			}
 		}
@@ -74,13 +85,15 @@ func (t *EventEmitter) handle() {
 }
 
 func (t *EventEmitter) Dispatch(e Event, data interface{}, err error) {
-	go func() {
-		t.eventCh <- &event{
-			Event: e,
-			Data:  data,
-			Err:   err,
-		}
-	}()
+	if len(t.handlers) > 0 {
+		fmt.Println("Notify handlers about new event")
+		t.ewg.Add(1) // wait for handlers to be notified
+	}
+	t.eventCh <- &event{
+		Event: e,
+		Data:  data,
+		Err:   err,
+	}
 }
 
 func (t *EventEmitter) Handler(handler EventHandler) {
@@ -88,6 +101,7 @@ func (t *EventEmitter) Handler(handler EventHandler) {
 }
 
 func (t *EventEmitter) Close() {
+	t.ewg.Wait() // waiting for all events to be notified to handlers
 	var wg sync.WaitGroup
 	for _, h := range t.handlers {
 		wg.Add(1)

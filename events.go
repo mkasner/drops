@@ -1,7 +1,6 @@
 package drops
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -67,12 +66,10 @@ func (t *EventEmitter) handle() {
 			t.wg.Done()
 			return
 		case e := <-t.eventCh:
-			fmt.Println("Going to handle event")
 			once := &sync.Once{}
 			for _, h := range t.handlers {
 				go func(h EventHandler) {
 					once.Do(func() {
-						fmt.Println("Handlers are notified")
 						t.ewg.Done() // handlers are notified
 					})
 					t.ewg.Add(1) // handling event
@@ -86,7 +83,6 @@ func (t *EventEmitter) handle() {
 
 func (t *EventEmitter) Dispatch(e Event, data interface{}, err error) {
 	if len(t.handlers) > 0 {
-		fmt.Println("Notify handlers about new event")
 		t.ewg.Add(1) // wait for handlers to be notified
 	}
 	t.eventCh <- &event{

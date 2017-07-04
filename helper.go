@@ -109,12 +109,14 @@ func Subcontent(app *App, contentKey string) []string {
 	return result
 }
 
+// Subcontents returns list of subcontents and their children combined
 func Subcontents(app *App, contentKeys []string) []string {
 	if len(contentKeys) == 0 {
 		return contentKeys
 	}
 	var result []string
 	for _, contentKey := range contentKeys {
+		result = append(result, contentKey)
 		result = append(result, loadSubcontent(app, contentKey)...)
 	}
 	result = uniqueSubcontents(result)

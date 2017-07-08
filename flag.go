@@ -1,6 +1,6 @@
 package drops
 
-type Flag uint
+type Flag uint64
 
 // SetFlag sets flag on a new flagset
 // Use it when you need only one flag set and others discarded

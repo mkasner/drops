@@ -1,7 +1,9 @@
 // Package i18n is used for basic translation of messages
 package i18n
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var (
 	instance    translator
@@ -31,6 +33,10 @@ type TranslationFunc func(string, ...interface{}) string
 // It prints formatted string if args are provided
 func translate(lang LangId, message string, args ...interface{}) string {
 	if ms, ok := instance.bundle[message]; ok {
+		// if default lang is empty set message as default language
+		if len(ms[0]) == 0 {
+			ms[0] = message
+		}
 		// if empty default language return message also
 		// this prevents empty messages
 		if ms == nil || len(ms) == 0 || (lang == 0 && len(ms[int(lang)]) == 0) {
@@ -40,7 +46,7 @@ func translate(lang LangId, message string, args ...interface{}) string {
 				return message
 			}
 		}
-		if int(lang) > len(ms)-1 {
+		if (int(lang) > len(ms)-1) || len(ms[int(lang)]) == 0 {
 			if args != nil && len(args) > 0 {
 				return fmt.Sprintf(ms[0], args...)
 			} else {

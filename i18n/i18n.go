@@ -25,6 +25,8 @@ func DefaultLang(l LangId) {
 
 type LangId uint8
 
+type TranslationFunc func(string, ...interface{}) string
+
 // Internal function for getting translation
 // It prints formatted string if args are provided
 func translate(lang LangId, message string, args ...interface{}) string {
@@ -61,10 +63,10 @@ func translate(lang LangId, message string, args ...interface{}) string {
 
 // Function L selects Language for the translation. It takes LangId and returns a function which
 // takes a message
-func L(langId LangId) func(string, ...interface{}) string {
-	return func(message string, args ...interface{}) string {
+func L(langId LangId) TranslationFunc {
+	return TranslationFunc(func(message string, args ...interface{}) string {
 		return translate(langId, message, args...)
-	}
+	})
 }
 
 // Function T means 'Translate'. It takes message

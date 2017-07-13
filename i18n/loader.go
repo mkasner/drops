@@ -6,6 +6,10 @@ import (
 	"gopkg.in/v2/yaml"
 )
 
+var (
+	bundleFiles []string
+)
+
 // loads translation file from yaml
 func LoadFile(files ...string) error {
 	bundle := make(Bundle)
@@ -35,5 +39,8 @@ func LoadFile(files ...string) error {
 		}
 	}
 	instance = translator{bundle: bundle}
+	if devMode {
+		bundleFiles = files
+	}
 	return nil
 }

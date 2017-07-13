@@ -8,6 +8,7 @@ import (
 var (
 	instance    translator
 	defaultLang LangId
+	devMode     bool
 )
 
 type translator struct {
@@ -23,6 +24,10 @@ func Load(bundle Bundle) error {
 
 func DefaultLang(l LangId) {
 	defaultLang = l
+}
+
+func DevMode(dev bool) {
+	devMode = dev
 }
 
 type LangId uint8
@@ -70,6 +75,12 @@ func translate(lang LangId, message string, args ...interface{}) string {
 // Function L selects Language for the translation. It takes LangId and returns a function which
 // takes a message
 func L(langId LangId) TranslationFunc {
+	if devMode {
+		return TranslationFunc(func(message string, args ...interface{}) string {
+			LoadFile(bundleFiles...)
+			return translate(langId, message, args...)
+		})
+	}
 	return TranslationFunc(func(message string, args ...interface{}) string {
 		return translate(langId, message, args...)
 	})

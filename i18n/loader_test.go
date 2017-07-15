@@ -30,7 +30,7 @@ func TestLoadFile(t *testing.T) {
 	}
 	translation = hrtr("msg3")
 	if translation != "poruka3" {
-		t.Fatalf("Wrong translation. expected: %s got %s", "poruka2", translation)
+		t.Fatalf("Wrong translation. expected: %s got %s", "poruka3", translation)
 	}
 	// test de
 	detr := L(de)
@@ -44,9 +44,9 @@ func TestLoadFile(t *testing.T) {
 	if translation != result {
 		t.Fatalf("Wrong translation. expected: %s got %s", result, translation)
 	}
-	translation = hrtr("msg3")
+	translation = detr("msg3")
 	if translation != "msg3" {
-		t.Fatalf("Wrong translation. expected: %s got %s", "poruka2", translation)
+		t.Fatalf("Wrong translation. expected: %s got %s", "msg3", translation)
 	}
 
 }

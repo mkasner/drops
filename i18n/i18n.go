@@ -39,7 +39,7 @@ type TranslationFunc func(string, ...interface{}) string
 func translate(lang LangId, message string, args ...interface{}) string {
 	if ms, ok := instance.bundle[message]; ok {
 		// if default lang is empty set message as default language
-		if len(ms[0]) == 0 {
+		if len(ms) > 0 && len(ms[0]) == 0 {
 			ms[0] = message
 		}
 		// if empty default language return message also

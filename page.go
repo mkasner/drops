@@ -23,6 +23,7 @@ type App struct {
 	Subdirectory  string
 	Dev           bool             // development mode, loads template from file
 	TemplateFuncs template.FuncMap `json:"-"`
+	WildcardMux   *WildcardMux
 }
 
 func (t *App) Init() {

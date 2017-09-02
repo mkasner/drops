@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 var (
@@ -27,9 +28,17 @@ func loadIds(app *App) {
 
 func loadHandlers(app *App) {
 	for _, p := range app.Pages {
-		if len(p.Url) > 0 && p.Handler != nil {
-			http.Handle(fmt.Sprintf("%s%s", app.Subdirectory, p.Url), p.Handler)
+		if p.Handler == nil {
+			continue
 		}
+		if len(p.Url) == 0 {
+			continue
+		}
+		if strings.Contains(p.Url, "*") {
+			app.WildcardMux.Handle(fmt.Sprintf("%s%s", app.Subdirectory, p.Url), p.Handler)
+			continue
+		}
+		http.Handle(fmt.Sprintf("%s%s", app.Subdirectory, p.Url), p.Handler)
 	}
 
 }

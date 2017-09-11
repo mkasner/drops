@@ -2,7 +2,13 @@ package drops
 
 import (
 	"net/http"
+	"regexp"
+	"strconv"
 	"strings"
+)
+
+var (
+	wildardRegex = regexp.MustCompile(`^(\d+)\*$`)
 )
 
 // WildcardMux is meant for routing paths to correct handlers
@@ -13,9 +19,10 @@ type WildcardMux struct {
 }
 
 type muxEntry struct {
-	pattern []string
-	score   int // how many non empty patterns are there
-	h       http.Handler
+	pattern  []string
+	score    int // how many non empty patterns are there
+	segments int // how many segments does this pattern cover
+	h        http.Handler
 }
 
 func NewWildcardMux() *WildcardMux {
@@ -60,12 +67,11 @@ func (t *WildcardMux) handler(path string) http.Handler {
 			// discard paths which are smaller than patterns
 			continue
 		}
-		if len(split) > len(entry.pattern) {
-			if entry.pattern[len(entry.pattern)-1] != "" {
-				// if path is bigger and last pattern element is not wildcard - discard
-				continue
-			}
+		// if path is not same size as pattern, discard it
+		if len(split) != len(entry.pattern) {
+			continue
 		}
+
 		var matchScore int
 		for i, segment := range entry.pattern {
 			if len(segment) == 0 {
@@ -78,7 +84,8 @@ func (t *WildcardMux) handler(path string) http.Handler {
 		}
 		if matchScore == entry.score {
 			// if last element is wildcard, try to find exact match
-			if entry.pattern[len(entry.pattern)-1] == "" && candidate.h == nil {
+			//if entry.pattern[len(entry.pattern)-1] == "" && candidate.h == nil {
+			if len(entry.pattern) == len(split) && candidate.h == nil {
 				candidate = entry
 				continue
 			}
@@ -102,4 +109,14 @@ func (t *WildcardMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h.ServeHTTP(w, r)
+}
+
+// used for repeating for segments
+func segmentFromWildcard(pattern string) int {
+	submatch := wildardRegex.FindStringSubmatch(pattern)
+	if len(submatch) == 2 {
+		segmentCount, _ := strconv.Atoi(submatch[1])
+		return segmentCount
+	}
+	return 0
 }

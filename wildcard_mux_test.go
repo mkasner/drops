@@ -107,6 +107,13 @@ func dummyHandler2(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "2")
 }
 
+func dummyHandler3(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "3")
+}
+func dummyHandler4(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "4")
+}
+
 // TestWildcardMuxMatch tests if correct handler is returing
 func TestWildcardMuxMatch(t *testing.T) {
 
@@ -127,10 +134,20 @@ func TestWildcardMuxMatch(t *testing.T) {
 			handler: []http.Handler{
 				http.HandlerFunc(dummyHandler1),
 				http.HandlerFunc(dummyHandler2),
-				http.HandlerFunc(dummyHandler1),
 			},
-			paths:   []string{"/one/two/four", "/one/three", "/one/two/four"},
-			results: []string{"1", "2", "1"},
+			paths:   []string{"/one/two/four", "/one/three", "/one/two"},
+			results: []string{"", "2", "1"},
+		},
+		{
+			pattern: []string{"/*/*/*", "/*/*", "/*/*/about", "/cars/audi/*/*"},
+			handler: []http.Handler{
+				http.HandlerFunc(dummyHandler1),
+				http.HandlerFunc(dummyHandler2),
+				http.HandlerFunc(dummyHandler3),
+				http.HandlerFunc(dummyHandler4),
+			},
+			paths:   []string{"/fruit/green/apple", "/fruit/banana", "/fruit/red/apple", "/toys/ball/about", "/cars/audi/a5/3.0"},
+			results: []string{"1", "2", "1", "3", "4"},
 		},
 	}
 
@@ -155,6 +172,26 @@ func TestWildcardMuxMatch(t *testing.T) {
 				}
 
 			}
+		}
+	}
+
+}
+
+func TestSegmentFromWildcard(t *testing.T) {
+	testData := []struct {
+		pattern string
+		result  int
+	}{
+		{pattern: "12*", result: 12},
+		{pattern: "12*1", result: 0},
+		{pattern: "a12*", result: 0},
+		{pattern: "2*", result: 2},
+		{pattern: "2**", result: 0},
+	}
+	for _, td := range testData {
+		result := segmentFromWildcard(td.pattern)
+		if result != td.result {
+			t.Fatalf("Error. Pattern: %s Expected: %d   Got: %d", td.pattern, td.result, result)
 		}
 	}
 

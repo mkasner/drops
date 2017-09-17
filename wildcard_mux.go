@@ -15,7 +15,8 @@ var (
 // but with one crucial feature: It can contain wildcard (*) in the route.
 // With that you can have dynamic parts of url's
 type WildcardMux struct {
-	m []muxEntry
+	m        []muxEntry
+	NotFound http.Handler
 }
 
 type muxEntry struct {
@@ -105,7 +106,12 @@ func (t *WildcardMux) handler(path string) http.Handler {
 func (t *WildcardMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h := t.handler(r.URL.Path)
 	if h == nil {
-		http.NotFoundHandler().ServeHTTP(w, r)
+		if t.NotFound != nil {
+			// custom notFound handler
+			t.NotFound.ServeHTTP(w, r)
+		} else {
+			http.NotFoundHandler().ServeHTTP(w, r)
+		}
 		return
 	}
 	h.ServeHTTP(w, r)

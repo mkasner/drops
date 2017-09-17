@@ -24,6 +24,7 @@ type App struct {
 	Dev           bool             // development mode, loads template from file
 	TemplateFuncs template.FuncMap `json:"-"`
 	WildcardMux   *WildcardMux
+	NotFound      http.Handler
 }
 
 func (t *App) Init() {

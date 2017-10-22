@@ -62,7 +62,7 @@ func TestFlags(t *testing.T) {
 	// setting multiple flags
 	flag = Flag1
 	flagset = 0
-	flagset = AddFlag(Flag1, Flag2, Flag3)
+	flagset = AddFlag(flagset, Flag1, Flag2, Flag3)
 	if !IsFlag(flagset, Flag2) {
 		t.Fatalf("Flag2 should be set")
 	}
@@ -71,6 +71,21 @@ func TestFlags(t *testing.T) {
 	fmt.Printf("flag1 %b %t\n", flagset, IsFlag(flagset, flag))
 	if IsFlag(flagset, flag) {
 		t.Fatalf("Flag1 should be not set")
+	}
+
+	// setting flag multiple times
+	fmt.Println("Setting flags multiple times")
+	flag = Flag1
+	flagset = 0
+	flagset = AddFlag(flagset, flag)
+	flagset = AddFlag(flagset, flag)
+	if !IsFlag(flagset, flag) {
+		t.Fatalf("Flag1 should be set")
+	}
+	flagset = UnsetFlag(flagset, flag)
+	flagset = UnsetFlag(flagset, flag)
+	if IsFlag(flagset, flag) {
+		t.Fatalf("Flag1 should not be set")
 	}
 
 }

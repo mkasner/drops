@@ -6,14 +6,14 @@ type Flag uint64
 // Use it when you need only one flag set and others discarded
 func SetFlag(flag Flag) Flag {
 	var newSet Flag
-	return newSet ^ flag
+	return newSet | flag
 }
 
 // AddFlag adds flag to existing flagset.
 // Useful when multiple flags want to be set
 func AddFlag(set Flag, flag ...Flag) Flag {
 	for _, f := range flag {
-		set = set ^ f
+		set = set | f
 	}
 	return set
 }
@@ -29,4 +29,13 @@ func IsFlag(set Flag, flag Flag) bool {
 		return true
 	}
 	return false
+}
+
+// ToggleFlag toggles flag to existing flagset.
+// Useful when multiple flags want to be set
+func ToggleFlag(set Flag, flag ...Flag) Flag {
+	for _, f := range flag {
+		set = set ^ f
+	}
+	return set
 }

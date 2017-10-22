@@ -40,12 +40,12 @@ func TestWildcardMux(t *testing.T) {
 			results: []bool{true, false, false},
 		},
 		{
-			pattern: []string{"/car/*/audi/*"},
+			pattern: []string{"/car/*/audi/*", "/car/*/audi/*/*"},
 			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(r.RequestURI)
 			}),
-			paths:   []string{"/car/suv/audi", "/fruit/apple", "/car/suv/audi/a5/sedan"},
-			results: []bool{false, false, true},
+			paths:   []string{"/car/suv/audi", "/fruit/apple", "/car/suv/audi/a5", "/car/suv/audi/a5/sedan"},
+			results: []bool{false, false, true, true},
 		},
 		{
 			pattern: []string{"/car/*/audi/*/owner"},
@@ -113,6 +113,9 @@ func dummyHandler3(w http.ResponseWriter, r *http.Request) {
 func dummyHandler4(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "4")
 }
+func dummyHandler5(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "5")
+}
 
 // TestWildcardMuxMatch tests if correct handler is returing
 func TestWildcardMuxMatch(t *testing.T) {
@@ -148,6 +151,18 @@ func TestWildcardMuxMatch(t *testing.T) {
 			},
 			paths:   []string{"/fruit/green/apple", "/fruit/banana", "/fruit/red/apple", "/toys/ball/about", "/cars/audi/a5/3.0"},
 			results: []string{"1", "2", "1", "3", "4"},
+		},
+		{
+			pattern: []string{"/*/*/*", "/*/*", "/*/*/about", "/cars/audi/*/*", "/*"},
+			handler: []http.Handler{
+				http.HandlerFunc(dummyHandler1),
+				http.HandlerFunc(dummyHandler2),
+				http.HandlerFunc(dummyHandler3),
+				http.HandlerFunc(dummyHandler4),
+				http.HandlerFunc(dummyHandler5),
+			},
+			paths:   []string{"/fruit/green/apple", "/fruit/banana", "/fruit/red/apple", "/toys/ball/about", "/cars/audi/a5/3.0", "/basket", "/"},
+			results: []string{"1", "2", "1", "3", "4", "5", "5"},
 		},
 	}
 

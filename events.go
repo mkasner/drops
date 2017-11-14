@@ -13,27 +13,27 @@ type event struct {
 }
 
 type handler struct {
-	h          EventHandler
-	stop, done chan struct{}
+	h EventHandler
 }
 
 type EventEmitter struct {
-	eventCh   chan *event
-	handlerCh chan EventHandler
-	handlers  []handler
-	wg        sync.WaitGroup // Emitter process wait group
-	ewg       sync.WaitGroup // Events wait group, waits for all events to notfiy handlers if they exist
-	closeCh   chan struct{}
+	eventCh      chan *event
+	handlerCh    chan EventHandler
+	handlers     []handler
+	wg           sync.WaitGroup // Emitter process wait group
+	closeCh      chan struct{}
+	recvCh       chan struct{}
+	stopDispatch bool
 }
 
 func NewEventEmitter() *EventEmitter {
 	ee := &EventEmitter{
 		eventCh:   make(chan *event, 100),
-		handlerCh: make(chan EventHandler, 1),
+		handlerCh: make(chan EventHandler),
 		handlers:  make([]handler, 0),
-		closeCh:   make(chan struct{}, 1),
+		closeCh:   make(chan struct{}),
+		recvCh:    make(chan struct{}),
 	}
-	ee.wg.Add(2)
 	go ee.register()
 	go ee.handle()
 
@@ -48,11 +48,9 @@ func (t *EventEmitter) register() {
 	for {
 		select {
 		case <-t.closeCh:
-			t.closeCh <- struct{}{}
-			t.wg.Done()
 			return
 		case h := <-t.handlerCh:
-			t.handlers = append(t.handlers, handler{h: h, stop: make(chan struct{}), done: make(chan struct{})})
+			t.handlers = append(t.handlers, handler{h: h})
 		}
 	}
 }
@@ -61,35 +59,30 @@ func (t *EventEmitter) handle() {
 	for {
 		select {
 		case <-t.closeCh:
-			//t.ewg.Wait()
-			t.closeCh <- struct{}{}
-			t.wg.Done()
 			return
 		case e := <-t.eventCh:
-			once := &sync.Once{}
+			t.wg.Add(len(t.handlers))
 			for _, h := range t.handlers {
-				go func(h EventHandler) {
-					once.Do(func() {
-						t.ewg.Done() // handlers are notified
-					})
-					t.ewg.Add(1) // handling event
-					h.Handle(e.Event, e.Data, e.Err)
-					t.ewg.Done() // handling event done
+				go func(eh EventHandler) {
+					eh.Handle(e.Event, e.Data, e.Err)
+					t.wg.Done()
 				}(h.h)
 			}
+			t.recvCh <- struct{}{}
 		}
 	}
 }
 
 func (t *EventEmitter) Dispatch(e Event, data interface{}, err error) {
-	if len(t.handlers) > 0 {
-		t.ewg.Add(1) // wait for handlers to be notified
+	if t.stopDispatch {
+		return
 	}
 	t.eventCh <- &event{
 		Event: e,
 		Data:  data,
 		Err:   err,
 	}
+	<-t.recvCh
 }
 
 func (t *EventEmitter) Handler(handler EventHandler) {
@@ -97,36 +90,18 @@ func (t *EventEmitter) Handler(handler EventHandler) {
 }
 
 func (t *EventEmitter) Close() {
-	t.ewg.Wait() // waiting for all events to be notified to handlers
-	var wg sync.WaitGroup
-	for _, h := range t.handlers {
-		wg.Add(1)
-		go func() {
-			go h.h.Stop(h.stop, h.done)
-			h.stop <- struct{}{}
-			<-h.done
-			wg.Done()
-		}()
-		wg.Wait()
-	}
-	// closing event emmiter processes for register and dispatch
+	t.stopDispatch = true
+	t.wg.Wait() // waiting for handlers to finish
 	t.closeCh <- struct{}{}
-	t.wg.Wait()
-	close(t.closeCh)
+	t.closeCh <- struct{}{}
 }
 
 type EventHandler interface {
 	Handle(Event, interface{}, error)
-	Stop(chan struct{}, chan struct{})
 }
 
 type EventHandlerFunc func(Event, interface{}, error)
 
 func (t EventHandlerFunc) Handle(e Event, data interface{}, err error) {
 	t(e, data, err)
-}
-
-func (t EventHandlerFunc) Stop(stop, done chan struct{}) {
-	<-stop
-	done <- struct{}{}
 }

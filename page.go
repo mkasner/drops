@@ -73,7 +73,7 @@ type Page struct {
 	Template     Template
 	HtmlMenuItem string
 	Parent       string
-	Permission   int
+	Permission   Permission
 	Submenu      MenuId
 	Description  string
 	Subcontent   []string // subcontent widgets which can be included on page
@@ -161,4 +161,20 @@ func MergeApps(app *App, merges ...App) *App {
 		}
 	}
 	return app
+}
+
+type Permission struct {
+	Page       uint     // used to group permissions of certain part of application
+	Permission []uint64 // concrete permission, checks if one of permissions is active
+}
+
+func Perm(page uint, permission ...uint64) Permission {
+	return Permission{Page: page, Permission: permission}
+}
+
+func (p *Permission) IsZero() bool {
+	if p.Page > 0 && len(p.Permission) > 0 {
+		return false
+	}
+	return true
 }

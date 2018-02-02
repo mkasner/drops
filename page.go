@@ -78,6 +78,7 @@ type Page struct {
 	Description  string
 	Subcontent   []string // subcontent widgets which can be included on page
 	Inactive     bool
+	Attrs        map[string]string // custom configuration for page
 }
 
 func (t *Page) HasMenu(mid MenuId) bool {

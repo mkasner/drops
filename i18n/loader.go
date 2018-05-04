@@ -3,7 +3,7 @@ package i18n
 import (
 	"io/ioutil"
 
-	"gopkg.in/v2/yaml"
+	"gopkg.in/yaml.v2"
 )
 
 var (

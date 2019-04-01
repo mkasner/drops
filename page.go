@@ -48,7 +48,7 @@ func (t *App) GetTemplate(id string) Template {
 		tpl, s := loadTemplate(t.TemplatePath, th.File, id, t.TemplateFuncs, t.Subdirectory)
 		return NewHtmlTemplate(th.Name(), th.File, s, tpl)
 	}
-	return tpl
+	return tpl.Clone()
 }
 
 func (t *App) GetWidget(id string) Template {
@@ -58,7 +58,7 @@ func (t *App) GetWidget(id string) Template {
 		tpl, s := loadTemplate(t.TemplatePath, th.File, id, t.TemplateFuncs, t.Subdirectory)
 		return NewHtmlTemplate(th.Name(), th.File, s, tpl)
 	}
-	return tpl
+	return tpl.Clone()
 }
 
 type Page struct {

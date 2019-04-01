@@ -11,6 +11,7 @@ type TemplateRepository struct {
 
 type Template interface {
 	Render(*bytes.Buffer, interface{}) (*bytes.Buffer, error)
+	Clone() Template
 }
 
 type HtmlTemplate struct {
@@ -33,6 +34,11 @@ func (t *HtmlTemplate) Name() string {
 	return t.name
 }
 
+func (t *HtmlTemplate) Clone() Template {
+	cln, _ := t.Tpl.Clone()
+	return &HtmlTemplate{name: t.name, File: t.File, Content: t.Content, Tpl: cln}
+}
+
 func NewHtmlTemplate(name, file string, content string, t *template.Template) *HtmlTemplate {
 	return &HtmlTemplate{
 		name:    name,
@@ -49,6 +55,10 @@ type SimpleTemplate struct {
 
 func (t *SimpleTemplate) Render(rcvr *bytes.Buffer, data interface{}) (*bytes.Buffer, error) {
 	return t.RenderFunc(rcvr, data)
+}
+
+func (t *SimpleTemplate) Clone() Template {
+	return t
 }
 
 func NewSimpleTemplate(name string, rf func(*bytes.Buffer, interface{}) (*bytes.Buffer, error)) *SimpleTemplate {
